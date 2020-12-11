@@ -5,7 +5,6 @@
 #include <stack>
 #include <map>
 
-
 void showStack(std::stack<char>);
 void showQueue(std::queue<int>);
 void clearQueue(std::queue<int>& outputQueue);
@@ -14,7 +13,6 @@ bool checkIfNumber(char character);
 
 int main() {
 
-	//std::vector<char> operators{ '+', '-', '/', '*', '(', ')' };
 	std::map<char, int> operators;
 	std::string expression;
 	std::queue<int> outputQueue;
@@ -34,7 +32,6 @@ int main() {
 
 	for (i = 0; i < expression.length(); i++) {
 		int index = i;
-		char expressionToCheck = expression[i];
 		if (isdigit(expression[i])) {
 			std::string fullNumber;
 
@@ -64,6 +61,7 @@ int main() {
 
 	clearQueue(outputQueue);
 	clearStack(operatorStack);
+	operators.clear();
 
 	return 0;
 
