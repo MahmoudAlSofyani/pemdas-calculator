@@ -15,7 +15,6 @@ int getAssociativity(char character);
 
 int main() {
 
-<<<<<<< HEAD
 	struct Operators {
 		char op;
 		int precendence;
@@ -32,9 +31,6 @@ int main() {
 	operations[3] = { '*', 1, 1 };
 	operations[4] = { '^', 2, 0 };
 
-=======
-	std::map<char, int> operators;
->>>>>>> 81892d58ff4c0dac2c7efda6c09df13e2326a772
 	std::string expression;
 	std::queue<int> outputQueue;
 	std::stack<char> operatorStack;
@@ -49,11 +45,7 @@ int main() {
 	for (int i = 0; i < expression.length(); i++) {
 
 		int index = i;
-<<<<<<< HEAD
 		if (isdigit(expression[index])) {
-=======
-		if (isdigit(expression[i])) {
->>>>>>> 81892d58ff4c0dac2c7efda6c09df13e2326a772
 			std::string fullNumber;
 			while (isdigit(expression[index])) {
 				fullNumber += expression[index];
@@ -99,7 +91,6 @@ int main() {
 
 	clearQueue(outputQueue);
 	clearStack(operatorStack);
-	operators.clear();
 
 	return 0;
 
