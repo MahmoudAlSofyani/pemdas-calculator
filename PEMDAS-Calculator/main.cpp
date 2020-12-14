@@ -5,6 +5,9 @@
 #include <stack>
 #include <map>
 
+const int LEFT_ASSOC = 0;
+const int RIGHT_ASSOC = 1;
+
 void showStack(std::stack<char>);
 void showQueue(std::queue<int>);
 void clearQueue(std::queue<int>& outputQueue);
@@ -15,22 +18,6 @@ int getAssociativity(char character);
 
 int main() {
 
-	struct Operators {
-		char op;
-		int precendence;
-		//0 -> Right
-		//1 -> Left
-		int associativity;
-	};
-
-	Operators operations[5];
-
-	operations[0] = { '+', 0, 1 };
-	operations[1] = { '-', 0, 1 };
-	operations[2] = { '/', 1, 1 };
-	operations[3] = { '*', 1, 1 };
-	operations[4] = { '^', 2, 0 };
-
 	std::string expression;
 	std::queue<int> outputQueue;
 	std::stack<char> operatorStack;
@@ -40,48 +27,46 @@ int main() {
 	std::getline(std::cin, expression);
 	expression.erase(remove(expression.begin(), expression.end(), ' '), expression.end());
 
-	int opIndex;
 
-	for (int i = 0; i < expression.length(); i++) {
+	int expressionLength = expression.length();
+	int counter = 0;
 
-		int index = i;
-		if (isdigit(expression[index])) {
-			std::string fullNumber;
-			while (isdigit(expression[index])) {
-				fullNumber += expression[index];
-				index++;
-			}
-			outputQueue.push(std::stoi(fullNumber));
+	while (expressionLength > 0) {
+		char token = expression[counter];
+	
+		if (isdigit(token)) {
+			outputQueue.push(token);
 		}
+		else if (token == '+' || token == '-' || token == '*' || token == '/' || token == '^') {
+			while (!operatorStack.empty() && (operatorStack.top() == '+' || operatorStack.top() == '-' || operatorStack.top() == '*' || operatorStack.top() == '/' || operatorStack.top() == '^') && ((getPrecedence(operatorStack.top()) > getPrecedence(token) || (getPrecedence(operatorStack.top()) == getPrecedence(token)) && getAssociativity(token) == 0)) && (operatorStack.top() != '(')) {
 
-		if (expression[index] == '+' || expression[index] == '-' || expression[index] == '/' || expression[index] == '*' || expression[index] == '^') {
-			for (int j = 0; j < 5; j++) {
-				if (expression[index] == operations[j].op) {
-					opIndex = j;
-				}
-			}
-
-			while (!operatorStack.empty() && (operatorStack.top() == '+' || operatorStack.top() == '-' || operatorStack.top() == '/' || operatorStack.top() == '*' || operatorStack.top() == '^')) {
-				if ((getAssociativity(expression[index]) == 1 && (getPrecedence(expression[index]) <= getPrecedence(operatorStack.top()))) || (getAssociativity(expression[index]) == 0 && (getPrecedence(expression[index]) < getPrecedence(operatorStack.top())))) {
-					outputQueue.push(operatorStack.top());
-					operatorStack.pop();
-				}
-			}
-			operatorStack.push(expression[index]);
-		}
-
-		if (expression[index] == '(') {
-			operatorStack.push(expression[index]);
-		}
-		if (expression[index] == ')') {
-			while (!operatorStack.empty() && operatorStack.top() != '(') {
 				outputQueue.push(operatorStack.top());
 				operatorStack.pop();
 			}
-			operatorStack.pop();
+			operatorStack.push(token);
 		}
-		i = index;
+		else if (token == '(') {
+			operatorStack.push(token);
+		}
+		else if (token == ')') {
+			while (operatorStack.top() != '(') {
+				outputQueue.push(operatorStack.top());
+				operatorStack.pop();
+			}
+			if (operatorStack.top() == '(') {
+				operatorStack.pop();
+			}
+		}
+		expressionLength--;
+		counter++;
 	}
+
+	while (!operatorStack.empty()) {
+		outputQueue.push(operatorStack.top());
+		operatorStack.pop();
+	}
+
+	
 
 	std::cout << "Operator Stack: " << std::endl;
 	showStack(operatorStack);
@@ -99,7 +84,7 @@ int main() {
 
 void showStack(std::stack<char> operatorStack) {
 	while (!operatorStack.empty()) {
-		std::cout << static_cast<char>(operatorStack.top()) << " ";
+		std::cout << operatorStack.top() << " ";
 		operatorStack.pop();
 	}
 	std::cout << std::endl;
@@ -107,7 +92,7 @@ void showStack(std::stack<char> operatorStack) {
 
 void showQueue(std::queue<int> outputQueue) {
 	while (!outputQueue.empty()) {
-		std::cout << outputQueue.front() << " ";
+		std::cout << static_cast<char>(outputQueue.front()) << " ";
 		outputQueue.pop();
 	}
 	std::cout << std::endl;
@@ -131,28 +116,32 @@ int getPrecedence(char character) {
 	switch (character) {
 	case '+':
 	case '-': {
-		return 0;
+		return 2;
 	}
 	case '/':
 	case '*': {
-		return 1;
+		return 3;
 	}
 	case '^': {
-		return 2;
+		return 4;
 	}
 	}
 }
 
 int getAssociativity(char character) {
+
+	// 0 - left
+	// 1 - right
+
 	switch (character) {
 	case '+':
 	case '-':
 	case '/':
 	case '*': {
-		return 1;
+		return LEFT_ASSOC;
 	}
 	case '^': {
-		return 0;
+		return RIGHT_ASSOC;
 	}
 	}
 }
